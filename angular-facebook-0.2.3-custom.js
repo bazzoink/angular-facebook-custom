@@ -31,7 +31,8 @@ provides: [facebook]
     '$rootScope',
     '$timeout',
     '$window',
-    function($q, $rootScope, $timeout, $window) {
+    '$log',
+    function($q, $rootScope, $timeout, $window, $log) {
       var initDeferred;
       var ngFacebookInstance;
 
@@ -53,7 +54,7 @@ provides: [facebook]
 
         // place this here to stop mvp
         $window.fbAsyncInit = function() {
-          console.log("Successfully loaded facebook");
+          $log.debug("Successfully loaded facebook");
         };
 
         $(document).ready(function() {
@@ -90,19 +91,19 @@ provides: [facebook]
 
                 initDeferred.resolve();
               } else {
-                error = new Error("fb MISSING");
+                error = new Error("Facebook SDK Missing [status: " + jqxhr.status + "]");
                 initDeferred.reject(error);
               }
             }
           ).fail(function(jqxhr, opts, exception) {
             doneLoading = true;
-            error = new Error("fb FAIL");
+            error = new Error("Facebook SDK failed to load [status: " + jqxhr.status + "]");
             initDeferred.reject(error);
           });
 
           $timeout(function() {
             if (!doneLoading) {
-              error = new Error("fb TIMEOUT");
+              error = new Error("Facebook SDK load timed out [timeout: 60000]");
               initDeferred.reject(error);
             }
           }, 60000);
